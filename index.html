@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>얼룩말영어학원 워마 중등베이직 33-34 어원 단어장</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #032014; }
+    ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; }
+    .perspective-1000 { perspective: 1000px; }
+    .preserve-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .glow-emerald { box-shadow: 0 0 20px rgba(16,185,129,0.15); }
+    .stripe-emerald {
+      background-image: repeating-linear-gradient(
+        45deg, #022c1b, #022c1b 8px, #10b981 8px, #10b981 10px
+      );
+    }
+  </style>
+</head>
+<body class="h-full text-slate-100 antialiased overflow-hidden bg-[#02130d]">
+  <div id="root" class="h-full"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    // 중등 BASIC 33-34과 40단어 어원/유래/동계어 전체 데이터 반영
+    const WORDS = [
+      { id: 1, word: "nurse", meaning: "간호사", prefix: "nutr- (기르다, 영양)", root: "nutrix (라틴어: 젖을 먹여 키우는 사람)", story: "원래는 아이에게 젖을 먹여 키우는 '유모'를 뜻했으나, 점차 아프고 연약한 자를 정성껏 보살피고 간호하는 사람으로 의미가 발전했습니다.", related: "nurture (양육하다), nutrition (영양), nutrient (영양소)" },
+      { id: 2, word: "sick", meaning: "아픈, 병든", prefix: "seok- (고통받는)", root: "seoc (고대 영어: 병든, 슬픈)", story: "몸이나 마음에 병이 들어 균형이 깨지고 괴로운 상태를 뜻하는 게르만 계통의 아주 오래된 단어입니다.", related: "sickness (질병), sickly (병약한), lovesick (상사병이 난)" },
+      { id: 3, word: "weak", meaning: "약한, 힘이 없는", prefix: "wreic- (구부러지다)", root: "wika (원시 게르만어: 유연해서 쉽게 부러지는)", story: "단단하지 못하고 외부의 힘을 받으면 꼿꼿이 버티지 못해 쉽게 휘어지거나 꺾일 정도로 기력이 쇠한 상태를 나타냅니다.", related: "weakness (약점), weaken (약화시키다), weakly (부사: 약하게)" },
+      { id: 4, word: "strong", meaning: "튼튼한, 건강한", prefix: "strenk- (팽팽한, 굳센)", root: "strang (고대 영어: 단단하고 강력한)", story: "밧줄을 양쪽에서 힘껏 팽팽하게 당겨놓은 것처럼, 근육과 골격이 단단하게 고정되어 활력이 가득한 건강한 상태를 뜻합니다.", related: "strength (힘), strengthen (강화하다), strongly (강력하게)" },
+      { id: 5, word: "fever", meaning: "열", prefix: "fev- (태우다, 뜨거운)", root: "febris (라틴어: 몸이 펄펄 끓는 열)", story: "바이러스와 싸우기 위해 몸이 불에 타오르듯 내부 온도를 인위적으로 뜨겁게 끌어올리는 현상에서 유래했습니다.", related: "febrile (열성적인, 열병의), feverish (열이 나는)" },
+      { id: 6, word: "cough", meaning: "기침; 기침하다", prefix: "co- (의성어 성격)", root: "coughen (중세 영어: 목청을 터뜨려 소리 내다)", story: "기도에 걸린 이물질을 뱉어내기 위해 허파의 공기를 순간적으로 '콜록콜록' 내뿜는 의성어적 결합에서 만들어진 단어입니다.", related: "cough drop (기침 멈춤 사탕), hiccup (딸기껌 - 유사 의성어)" },
+      { id: 7, word: "pain", meaning: "고통, 통증", prefix: "poin- (벌, 대가)", root: "poena (라틴어: 처벌, 죄에 대한 대가)", story: "고대에는 아픔을 죄를 지은 인간이 신에게 벌을 받을 때 치르는 대가로 여겼습니다. 여기서 '처벌의 아픔'이 일반적인 '통증'의 뜻으로 굳어졌습니다.", related: "penalty (처벌, 불이익), penal (형벌의), punish (처벌하다)" },
+      { id: 8, word: "hospital", meaning: "병원", prefix: "hospit- (손님, 나그네)", root: "hospitalis (라틴어: 나그네를 친절히 환대하는 방)", story: "원래 중세 시대에 순례자나 지친 여행자(guest)들을 쉬게 하던 자선 보호소에서, 나중에 아픈 환자들을 전문적으로 치료하는 현대의 병원으로 정착되었습니다.", related: "hotel (호텔), hospitality (환대), host (주인)" },
+      { id: 9, word: "headache", meaning: "두통", prefix: "head (머리) + ache (지속적인 통증)", root: "heafod + acan (고대 영어의 직관적 결합)", story: "몸의 우두머리 격인 머리(head) 부위가 끊이지 않고 신경 쓰이게 욱신욱신 아픈(ache) 증상을 문자 그대로 결합했습니다.", related: "stomachache (복통), backache (요통), toothache (치통)" },
+      { id: 10, word: "medicine", meaning: "약, 약물", prefix: "med- (치료하다, 살피다)", root: "medicina (라틴어: 의사의 기술, 의술)", story: "환자의 상처나 병세를 주의 깊게 살피고 조절하여 올바른 상태로 치유해 주는 물질적 도구인 '약물'을 뜻합니다.", related: "medical (의학의), medication (약물 치료), remedy (치료법, 구제책)" },
+      { id: 11, word: "weight", meaning: "무게, 체중", prefix: "wegh- (나르다, 움직이다)", root: "wiht (고대 영어: 저울의 무거움)", story: "수레에 짐을 싣고 나를 때 밑으로 묵직하게 가라앉는 중력의 크기를 저울 위에 수치화하여 잰 무게를 의미합니다.", related: "weigh (무게를 달다), weighty (중대한, 무거운), wagon (짐수레)" },
+      { id: 12, word: "tired", meaning: "피곤한, 지친", prefix: "tior- (약해지다, 끊어지다)", root: "tiorian (고대 영어: 힘이 빠져 완전히 탈진하다)", story: "오랜 시간 고된 노동을 하거나 에너지를 과도하게 쏟아부어 생체 기력이 완전히 바닥나 숨이 차고 지친 상태를 의미합니다.", related: "tire (지치게 하다), tiresome (지루한, 짜증 나는), tiredness (피로)" },
+      { id: 13, word: "hurt", meaning: "다치게 하다; 아프다", prefix: "hirt- (치다, 충돌하다)", root: "hurten (고대 프랑스어: 단단한 벽에 쾅 부딪히다)", story: "길을 가다 날카롭거나 단단한 모퉁이에 몸을 세게 쾅 부딪혀 상처를 입고 통증을 호소하는 장면에서 파생되었습니다.", related: "hurtful (마음을 아프게 하는), unhurt (다치지 않은, 무사한)" },
+      { id: 14, word: "treat", meaning: "치료하다; 다루다, 대하다", prefix: "tract- (끌다, 다루다)", root: "tractare (라틴어: 손으로 세심하게 만지며 조절하다)", story: "거친 사물을 손으로 부드럽게 쓰다듬으며 '다루다'라는 기본 뜻에서, 의사가 환자를 보살펴 '치료하다'라는 뜻까지 확장되었습니다.", related: "treatment (치료, 대우), treaty (조약 - 잘 조율된 문서), tractor (트랙터)" },
+      { id: 15, word: "relax", meaning: "휴식을 취하다, 쉬다", prefix: "re- (다시, 반대) + lax (느슨한)", root: "relaxare (라틴어: 탱탱하게 조여져 있던 줄을 다시 풀어주다)", story: "온몸의 근육과 신경이 활시위처럼 팽팽하게 굳어있던 긴장 상태를 거꾸로(re) 헐겁게 느슨하게(lax) 풀어 편안하게 쉬는 행위입니다.", related: "lax (느슨한, 규율이 해이한), delay (지연시키다), relay (교대하다)" },
+      { id: 16, word: "advice", meaning: "조언, 충고", prefix: "ad- (to) + vis- (바라보다)", root: "advisum (라틴어: 내가 사물을 지켜보고 얻은 견해)", story: "상대방이 처한 곤란한 상황을 제3자의 입장에서 똑바로 지켜본 뒤, '내 시선에는 이것이 옳게 보인다'며 건네는 지혜로운 의견입니다.", related: "advise (조언하다), adviser (조언자), vision (시각, 비전), visual (시각적인)" },
+      { id: 17, word: "health", meaning: "건강", prefix: "hal- (온전한, 다치지 않은) + th (명사형)", root: "hælth (고대 영어: 깨진 곳 없이 전체가 멀쩡함)", story: "육체나 정신의 어느 한 구석도 부서지거나 균열이 생기지 않고 통째로 온전하고 깨끗한(whole) 이상적인 상태를 뜻합니다.", related: "heal (치료하다), holy (신성한 - 흠 없는), whole (전체의, 전부의)" },
+      { id: 18, word: "stomach", meaning: "위, 배", prefix: "stoma- (입, 구멍)", root: "stomachus (라틴어: 음식물이 통과하는 입구 주머니)", story: "원래는 그리스어로 그리스어 stoma(입)에서 파생되어 음식물이 목구멍을 통해 아래로 내려가 쌓이는 장기인 '위와 배'를 가리키게 되었습니다.", related: "stoma (기공, 숨구멍), stomatitis (구내염)" },
+      { id: 19, word: "see a doctor", meaning: "병원에 가다, 진찰을 받다", prefix: "see (만나다) + doctor (의사, 박사)", root: "고대 영어와 라틴어의 구어적 결합 숙어", story: "몸이 심하게 아플 때 고도의 의학적 지식을 공인받은 전문가인 의사(doctor)를 직접 찾아가 눈으로 대면하고(see) 진찰을 받는 숙어입니다.", related: "see (보다), doctor (의사 - 가르치는 자)" },
+      { id: 20, word: "catch a cold", meaning: "감기에 걸리다", prefix: "catch (움켜쥐다) + cold (추위, 찬 기운)", root: "게르만/프랑스 계통 숙어 구조", story: "방심한 사이 주변에 감도는 사악하고 차가운 겨울 기운(cold)이 내 호흡기 내부로 슥 들어왔을 때 그것을 낚아채듯 붙잡아(catch) 앓아눕는 묘사입니다.", related: "catch (잡다), cold (추운)" },
+      { id: 21, word: "grass", meaning: "풀, 잔디", prefix: "ghre- (초록으로 자라다)", root: "græs (고대 영어: 땅바닥에서 번지는 푸른 초목)", story: "봄철이 되면 대지 위를 온통 푸른 초록색(green)으로 덮으며 사방으로 무성하게 쑥쑥 자라나는 식물 덩어리를 말합니다.", related: "green (초록색의), grow (자라다), growth (성장)" },
+      { id: 22, word: "flower", meaning: "꽃", prefix: "flo- (꽃이 피다, 만발하다)", root: "flos / floris (라틴어: 영양의 결정체인 꽃)", story: "식물이 생애 가장 아름답고 화려하게 에너지를 폭발시켜 피워내는 결정체로, 로마 신화의 꽃과 봄의 여신 '플로라(Flora)'에서 유래했습니다.", related: "flora (식물상), flourish (번창하다 - 꽃피우다), floral (꽃무늬의)" },
+      { id: 23, word: "tree", meaning: "나무", prefix: "deru- (단단한, 견고한)", root: "treow (고대 영어: 단단하게 우뚝 선 나무)", story: "땅속에 수미터의 뿌리를 단단하게 박고 하늘을 향해 오랜 세월 흔들림 없이 줄기를 뻗어 올린 단단한 나무를 뜻합니다.", related: "trust (신뢰 - 단단한 마음), true (진실한), truth (진리)" },
+      { id: 24, word: "leaf", meaning: "잎, 나뭇잎", prefix: "leup- (껍질을 벗기다, 조각)", root: "leaf (고대 영어: 나뭇가지에 매달린 얇은 파편)", story: "나뭇가지에 돋아난 평평하고 얇은 유기물 조각을 뜻하며, 나아가 오늘날 책의 얇은 종이 '한 장'을 지칭하는 용어로 비유 확장되었습니다.", related: "leaflet (소책자, 전단지), leafy (잎이 우거진), leaf through (책장을 넘기다)" },
+      { id: 25, word: "stone", meaning: "돌", prefix: "stai- (응축되다, 단단하게 굳다)", root: "stan (고대 영어: 조각나지 않는 단단한 광물)", story: "부드러운 흙이나 모래와 달리 오랜 압력을 받아 분자가 조밀하게 고정되어 뭉쳐진 자연 속의 알갱이나 덩어리인 '돌'을 뜻합니다.", related: "stony (돌이 많은, 냉혹한), Stonehenge (스톤헨지)" },
+      { id: 26, word: "wood", meaning: "나무, 목재; (-s) 숲", prefix: "widu- (나무, 재목)", root: "wudu (고대 영어: 가공할 수 있는 나무 자원)", story: "가구나 건축을 하기 위해 유용하게 벌목한 '목재'를 기본적으로 일컬으며, 이 목재용 나무들이 떼를 지어 빽빽하게 군락을 이룬 공간인 '숲(-s)'을 뜻합니다.", related: "wooden (나무로 된), woods (숲), woody (나무가 우거진)" },
+      { id: 27, word: "fruit", meaning: "과일, 열매", prefix: "frug- (누리다, 즐기다)", root: "fructus (라틴어: 노력을 바쳐 농사지은 수확을 즐김)", story: "계절 내내 정성껏 식물을 가꾼 뒤, 그 결과물로 맺힌 달콤한 열매를 인간이 따서 입으로 맛있게 즐기는(enjoy) 최종 소출을 말합니다.", related: "fruition (결실, 성취), fruitful (풍성한, 유익한)" },
+      { id: 28, word: "branch", meaning: "나뭇가지", prefix: "brac- (팔, 갈라지다)", root: "branca (라틴어: 동물의 발바닥, 갈라진 줄기)", story: "두꺼운 나무의 기둥 중심부에서 마치 인간의 팔이나 동물의 발가락 구조처럼 사방 갈래로 뻗어 나간 세부 '나뭇가지'를 연상시킵니다.", related: "embrace (포옹하다 - 팔로 안다), bracelet (팔찌)" },
+      { id: 29, word: "ground", meaning: "땅, 토양", prefix: "ghren- (갈다, 부수다, 바닥)", root: "grund (고대 영어: 건물의 맨 밑바닥 기초 대지)", story: "인간이 발바닥을 안전하게 붙이고 걸어 다닐 수 있도록 평평하게 다져진 지구 표면의 '땅'을 뜻합니다.", related: "groundless (근거 없는, 땅이 없는), underground (지하의)" },
+      { id: 30, word: "soil", meaning: "토양, 흙", prefix: "sed- (앉다, 정착하다)", root: "solium (라틴어: 식물이 뿌리박고 앉는 대지)", story: "풀과 나무의 뿌리가 영양분을 빨아들이기 위해 안락하게 자리를 잡고 앉아 있는 유기물이 풍부한 표면의 '흙'을 의미합니다.", related: "soil (명사/동사: 더럽히다 - 진흙이 묻다)" },
+      { id: 31, word: "field", meaning: "들판, 밭; 현장; 경기장", prefix: "pel- (넓고 평평한 공간)", root: "feld (고대 영어: 나무를 베어내 탁 트인 평원)", story: "울창한 원시림의 나무들을 다 잘라내어 시야가 확 트이게 개간한 '들판이나 농사용 밭'을 뜻하며, 현재는 전문 지식이 쓰이는 '현장/분야'로 파생되었습니다.", related: "fieldwork (현장 조사), outfield (외야)" },
+      { id: 32, word: "farm", meaning: "농장, 농원", prefix: "firm- (고정된, 약속된)", root: "firma (라틴어: 일정하게 고정된 계약 임대료)", story: "중세 시대에 매년 고정된 액수의 돈을 지주에게 내기로 굳게 약속하고 빌려서 경작하던 대규모 '임대 농지'의 성격에서 파생되었습니다.", related: "firm (회사, 단단한), confirm (확인하다), affirm (확언하다)" },
+      { id: 33, word: "water", meaning: "물; 물을 주다", prefix: "wed- (축축한, 투명한)", root: "wæter (고대 영어: 액체 생명의 근원)", story: "지구 생명체가 살아가기 위해 매일 마셔야 하는 가장 기본적이고 축축한 액체인 '물'을 뜻하며, 식물에 물을 부어 공급하는 동작까지 포함합니다.", related: "wet (젖은), waterproof (방수의), watermelon (수박)" },
+      { id: 34, word: "dig", meaning: "파다, 캐내다", prefix: "diki- (도랑을 쪼개다)", root: "dic (고대 영어: 도구를 써서 흙을 파내어 도랑을 만드는 행위)", story: "삽이나 손가락 끝에 강한 힘을 주어 흙벽을 무너뜨려 구멍을 만들거나, 묻혀 있는 식물의 소중한 뿌리나 보물을 바깥으로 꺼내는 모션입니다.", related: "ditch (도랑, 수로), dike (제방, 둑)" },
+      { id: 35, word: "grow", meaning: "재배하다, 기르다; 자라다", prefix: "ghre- (초록색으로 파릇하게 변하다)", root: "growan (고대 영어: 식물이 새싹을 틔워 부피를 키우다)", story: "봄철 햇살을 받아 죽어있던 땅에서 푸른 싹이 돋아나 세포를 불려 나가는 '자라다'에서, 사람이 농작물을 정성껏 '기르다'라는 타동사 의미까지 융합되었습니다.", related: "growth (성장), grass (풀), green (초록색)" },
+      { id: 36, word: "plant", meaning: "식물; 심다", prefix: "plat- (평평한, 발바닥)", root: "planta (라틴어: 발바닥으로 흙을 꾹 밟아 고정한 새싹)", story: "고대인들이 땅을 파고 어린나무를 넣은 뒤 흙이 흔들리지 않도록 발바닥(plat)으로 주변을 꾹꾹 눌러 '심은 초목'에서 단어가 유래했습니다. 현재는 공장 설비라는 뜻으로도 쓰입니다.", related: "plantation (대농장), transplant (이식하다), plate (접시)" },
+      { id: 37, word: "bean", meaning: "콩", prefix: "bha- (통통하게 부풀다)", root: "bean (고대 영어: 껍질 속에 영양이 들어찬 둥근 씨앗)", story: "길쭉한 식물 주머니(꼬투리) 속에서 동글동글하게 살이 통통히 올라 영양 성분을 가득 응축해 놓은 곡물인 '콩'을 뜻합니다.", related: "beanstalk (콩나무 줄기), jellybean (젤리빈)" },
+      { id: 38, word: "vegetable", meaning: "채소", prefix: "veg- (생기 넘치는, 활력이 도는)", root: "vegetabilis (라틴어: 식물이 푸르게 살아 움직이듯 무럭무럭 자람)", story: "대지에서 수분과 에너지를 흡수하여 아주 싱싱하고 생기 넘치게(vigorous) 자라나 인간에게 푸른 영양을 전해주는 '채소'를 의미합니다.", related: "vegetation (초목, 식생), vegetarian (채식주의자), vigor (활력)" },
+      { id: 39, word: "right away", meaning: "즉시, 곧바로", prefix: "right (올바른, 일직선의) + away (저 멀리로 출발하여)", root: "고대 영어 기반 부사구의 구조적 융합", story: "좌우로 길을 잘못 들어 비뚤어지거나 중간에 지체하는 굽은 선 없이, 목적지를 향해 자를 대고 그은 듯 일직선(right)으로 즉시 튀어 나가는 신속함의 비유입니다.", related: "right (오른쪽, 올바른), away (떨어져서)" },
+      { id: 40, word: "pick up", meaning: "~을 집다; ~을 (차에) 태우러 가다", prefix: "pick (바늘로 찌르다, 콕 집다) + up (위쪽 방향으로)", root: "중세 게르만어 계통 숙어 조합", story: "바닥에 조그맣게 떨어져 있는 사물을 손가락 끝으로 정확히 콕 집어서(pick) 위로(up) 가볍게 들어 올린다는 기본 뜻에서, 사람을 차에 태우다까지 번졌습니다.", related: "pick (선택하다, 고르다), pickup truck (픽업트럭)" }
+    ];
+
+    function App() {
+      const [activeTab, setActiveTab] = useState("list"); // list 또는 card
+      const [currentIndex, setCurrentIndex] = useState(0);
+      const [searchQuery, setSearchQuery] = useState("");
+      const [bookmarked, setBookmarked] = useState(new Set());
+      const [memorized, setMemorized] = useState(new Set());
+      const [showMeaning, setShowMeaning] = useState(true);
+      const [filterMode, setFilterMode] = useState("all");
+      const [isPlaying, setIsPlaying] = useState(false);
+      const [speechRate, setSpeechRate] = useState(0.9);
+      const autoPlayTimer = useRef(null);
+
+      // 영어 발음 청취 TTS
+      const playPronunciation = (text) => {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const clean = text.replace(/\[.*?\]/g,'').replace(/\(.*?\)/g,'').trim();
+          const u = new SpeechSynthesisUtterance(clean);
+          u.lang = 'en-US'; u.rate = speechRate;
+          window.speechSynthesis.speak(u);
+        }
+      };
+
+      // 한국어 뜻 청취 TTS
+      const playMeaning = (text) => {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const clean = text.replace(/[\(\)·\[\]~;]/g,'');
+          const u = new SpeechSynthesisUtterance(clean);
+          u.lang = 'ko-KR'; u.rate = 1.0;
+          window.speechSynthesis.speak(u);
+        }
+      };
+
+      // 필터 및 검색 정밀 처리
+      const filteredWords = useMemo(() => {
+        return WORDS.filter(item => {
+          const q = searchQuery.toLowerCase();
+          const match = item.word.toLowerCase().includes(q) || 
+                        item.meaning.includes(searchQuery) ||
+                        (item.related && item.related.toLowerCase().includes(q)) ||
+                        (item.root && item.root.toLowerCase().includes(q));
+          if (!match) return false;
+          if (filterMode === "bookmarked") return bookmarked.has(item.id);
+          if (filterMode === "not_memorized") return !memorized.has(item.id);
+          return true;
+        });
+      }, [searchQuery, filterMode, bookmarked, memorized]);
+
+      const currentWord = filteredWords[currentIndex] || filteredWords[0] || null;
+
+      const handleNext = () => {
+        if (!filteredWords.length) return;
+        setCurrentIndex(p => (p + 1) % filteredWords.length);
+        setShowMeaning(true);
+      };
+
+      const handlePrev = () => {
+        if (!filteredWords.length) return;
+        setCurrentIndex(p => (p - 1 + filteredWords.length) % filteredWords.length);
+        setShowMeaning(true);
+      };
+
+      useEffect(() => {
+        setCurrentIndex(0); setShowMeaning(true);
+      }, [filterMode, searchQuery]);
+
+      // 데스크톱 호환 하드웨어 키보드 바인딩
+      useEffect(() => {
+        const handler = (e) => {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+          if (e.key === 'ArrowRight') handleNext();
+          else if (e.key === 'ArrowLeft') handlePrev();
+          else if (e.key === ' ') { e.preventDefault(); setShowMeaning(p => !p); }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+      }, [currentIndex, filteredWords]);
+
+      // 자동 스트리밍 모드 루프
+      useEffect(() => {
+        if (isPlaying && currentWord) {
+          playPronunciation(currentWord.word);
+          autoPlayTimer.current = setTimeout(() => {
+            if (showMeaning) playMeaning(currentWord.meaning);
+            autoPlayTimer.current = setTimeout(handleNext, 4300);
+          }, 1800);
+        }
+        return () => clearTimeout(autoPlayTimer.current);
+      }, [isPlaying, currentIndex, currentWord, showMeaning]);
+
+      const toggleBookmark = (id) => setBookmarked(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
+      const toggleMemorized = (id) => setMemorized(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+      return (
+        <div class="h-screen flex flex-col bg-[#02130d] text-slate-200 select-none overflow-hidden">
+          
+          {/* TOP HEADER */}
+          <div class="relative bg-[#021f14] px-4 pt-4 pb-3 border-b border-emerald-900/40 flex-shrink-0">
+            <div class="absolute inset-x-0 top-0 h-1 stripe-emerald"></div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="px-1.5 py-0.5 bg-emerald-600 text-white font-black text-[9px] rounded mono tracking-wider">ZEBRA</span>
+                  <span class="text-[10px] text-emerald-400 font-bold mono">중등 BASIC [33-34과]</span>
+                </div>
+                <h1 class="text-sm font-bold text-white mt-0.5">워마 건강·자연 어원 단어장</h1>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-emerald-600 block mono font-semibold">암기율</span>
+                <span class="text-xs font-bold text-emerald-400 mono">{memorized.size} <span class="text-[10px] text-emerald-700">/ {WORDS.length}</span></span>
+              </div>
+            </div>
+
+            {/* PROGRESS BAR */}
+            <div class="w-full h-1 bg-[#01140d] rounded-full mt-3 overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-300"
+                style={{ width: `${(memorized.size / WORDS.length) * 100}%` }}></div>
+            </div>
+          </div>
+
+          {/* MAIN CONTENTS CONTAINER */}
+          <div class="flex-1 overflow-hidden relative bg-[#02130d]">
+            
+            {/* 1. LIST VIEW TAB */}
+            {activeTab === "list" && (
+              <div class="h-full flex flex-col fade-in">
+                {/* Filters */}
+                <div class="p-2 bg-[#021f14] border-b border-emerald-950 grid grid-cols-3 gap-1">
+                  {[["all","전체","text-slate-300"],["bookmarked","★ 북마크","text-amber-400"],["not_memorized","미암기","text-emerald-400"]].map(([mode, label, color]) => (
+                    <button key={mode} onClick={() => setFilterMode(mode)}
+                      class={`py-1.5 text-xs rounded-lg font-medium transition-all ${filterMode === mode ? "bg-emerald-950/60 border border-emerald-600/40 " + color : "text-slate-500 hover:bg-[#032014]"}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search Bar */}
+                <div class="p-2 bg-[#02130d] border-b border-slate-900 relative">
+                  <input type="text" placeholder="단어·뜻·어근·동계어 스마트 검색..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    class="w-full pl-8 pr-3 py-1.5 bg-[#032014] border border-emerald-950 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors"
+                  />
+                  <span class="absolute left-4 top-3.5 text-slate-600 text-xs">⌕</span>
+                </div>
+
+                {/* Word Scroll List */}
+                <div class="flex-1 overflow-y-auto divide-y divide-emerald-950/40 pb-12">
+                  {filteredWords.length === 0 ? (
+                    <div class="p-12 text-center text-xs text-slate-600 mono">검색 조건에 맞는 단어가 없습니다.</div>
+                  ) : filteredWords.map((item, idx) => {
+                    const isM = memorized.has(item.id);
+                    const isB = bookmarked.has(item.id);
+                    return (
+                      <div key={item.id}
+                        onClick={() => { setCurrentIndex(idx); setShowMeaning(true); setActiveTab("card"); }}
+                        class="p-3.5 cursor-pointer flex items-center justify-between bg-[#02130d] hover:bg-[#031d13] active:bg-[#031d13] transition-colors">
+                        <div class="min-w-0 pr-4">
+                          <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] mono text-emerald-800">{item.id}.</span>
+                            <span class={`font-bold text-sm tracking-tight ${isM ? "text-emerald-800 line-through decoration-emerald-900" : "text-slate-200"}`}>{item.word}</span>
+                          </div>
+                          <p class={`text-xs mt-1 truncate ${isM ? "text-emerald-900" : "text-slate-400"}`}>{item.meaning}</p>
+                        </div>
+                        <div class="flex gap-2" onClick={e => e.stopPropagation()}>
+                          <button onClick={() => toggleBookmark(item.id)}
+                            class={`p-2 text-sm transition-colors rounded-lg ${isB ? "text-amber-400 bg-amber-500/5" : "text-slate-700"}`}>★</button>
+                          <button onClick={() => toggleMemorized(item.id)}
+                            class={`p-2 text-sm transition-colors rounded-lg ${isM ? "text-emerald-400 bg-emerald-500/5" : "text-slate-700"}`}>✔</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 2. CARD STUDY TAB (WITH SCROLLABLE ETYMO) */}
+            {activeTab === "card" && (
+              <div class="h-full flex flex-col p-4 justify-between overflow-y-auto pb-16 fade-in">
+                
+                {/* Card Settings Bar */}
+                <div class="flex-shrink-0 flex items-center justify-between bg-[#021f14] border border-emerald-900/30 rounded-xl px-3 py-1.5 mb-3">
+                  <div class="text-[11px] font-bold text-slate-500 mono">
+                    CARD <span class="text-emerald-400">{currentIndex + 1}</span> / {filteredWords.length}
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <select value={speechRate} onChange={e => setSpeechRate(parseFloat(e.target.value))}
+                      class="bg-[#032014] text-[10px] mono text-slate-400 rounded border border-emerald-950 px-1 py-0.5 focus:outline-none">
+                      <option value="0.7">0.7x</option>
+                      <option value="0.9">0.9x</option>
+                      <option value="1.1">1.1x</option>
+                    </select>
+                    <button onClick={() => setIsPlaying(p => !p)}
+                      class={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all ${isPlaying ? "bg-rose-600 text-white" : "bg-emerald-600 text-white"}`}>
+                      {isPlaying ? "정지" : "▶ 자동"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Main Card View Space */}
+                <div class="w-full flex flex-col gap-4 items-center justify-start flex-1">
+                  {currentWord ? (
+                    <React.Fragment>
+                      
+                      {/* Flip Card Unit */}
+                      <div onClick={() => setShowMeaning(p => !p)} class="perspective-1000 w-full max-w-sm h-48 cursor-pointer relative flex-shrink-0">
+                        <div class={`w-full h-full duration-300 preserve-3d transition-transform relative ${!showMeaning ? "rotate-y-180" : ""}`}>
+                          
+                          {/* CARD FRONT (ENGLISH WORD) */}
+                          <div class="absolute w-full h-full bg-[#031d13] border border-emerald-900/40 rounded-2xl flex flex-col justify-between p-4 backface-hidden glow-emerald">
+                            <div class="flex justify-between items-center w-full">
+                              <span class="text-[9px] mono text-emerald-700 font-bold tracking-wider uppercase">ENGLISH WORD</span>
+                              <button onClick={e => { e.stopPropagation(); toggleBookmark(currentWord.id); }}
+                                class={`text-sm ${bookmarked.has(currentWord.id) ? "text-amber-400" : "text-slate-700"}`}>★</button>
+                            </div>
+                            <div class="text-center px-2">
+                              <h2 class="text-3xl font-black text-white tracking-tight select-all">{currentWord.word}</h2>
+                              <p class="text-[10px] text-slate-500 mt-1.5">화면을 탭하면 한국어 뜻 확인</p>
+                            </div>
+                            <div class="flex justify-center">
+                              <button onClick={e => { e.stopPropagation(); playPronunciation(currentWord.word); }}
+                                class="px-3 py-1 rounded-full bg-[#02130d] border border-emerald-900/40 text-emerald-400 text-[10px] font-medium active:scale-95 transition-transform">
+                                🔊 발음 듣기
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* CARD BACK (KOREAN MEANING) */}
+                          <div class="absolute w-full h-full bg-[#021f14] border border-emerald-800 rounded-2xl flex flex-col justify-between p-4 backface-hidden rotate-y-180">
+                            <div class="flex justify-between items-center w-full">
+                              <span class="text-[9px] mono text-emerald-500 font-bold tracking-wider uppercase">MEANING</span>
+                              <button onClick={e => { e.stopPropagation(); toggleMemorized(currentWord.id); }}
+                                class={`text-xs px-2 py-0.5 rounded border ${memorized.has(currentWord.id) ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400" : "border-emerald-950 text-slate-500"}`}>
+                                ✓ {memorized.has(currentWord.id) ? "외웠음" : "미암기"}
+                              </button>
+                            </div>
+                            <div class="text-center px-1">
+                              <p class="text-base font-bold text-emerald-300 leading-snug break-all">{currentWord.meaning}</p>
+                              <button onClick={e => { e.stopPropagation(); playMeaning(currentWord.meaning); }}
+                                class="text-[10px] text-slate-500 active:text-slate-300 mt-2 underline decoration-emerald-800">🔊 뜻 듣기</button>
+                            </div>
+                            <p class="text-center text-[9px] text-emerald-700">다시 탭하면 영단어가 노출됩니다</p>
+                          </div>
+
+                        </div>
+                      </div>
+
+                      {/* Mobile Optimized Etymology Info Display Card */}
+                      <div class="w-full max-w-sm bg-[#021f14] border border-emerald-900/40 rounded-xl p-4 text-left glow-emerald">
+                        <div class="flex items-center gap-1.5 mb-2.5">
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          <span class="text-[9px] uppercase mono font-black tracking-widest text-emerald-400">어원 입체 학습 분석기</span>
+                        </div>
+                        
+                        <div class="space-y-3">
+                          {/* Prefix & Root Badges */}
+                          <div class="flex flex-wrap gap-1 text-[10px] font-medium">
+                            <span class="px-2 py-0.5 bg-[#032014] rounded-md text-slate-300 border border-emerald-950 mono">
+                              형태: <b class="text-emerald-400 font-semibold">{currentWord.prefix || "기본형"}</b>
+                            </span>
+                            {currentWord.root && (
+                              <span class="px-2 py-0.5 bg-[#032014] rounded-md text-slate-300 border border-emerald-950 mono">
+                                어근: <b class="text-teal-400 font-semibold">{currentWord.root}</b>
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Story Narrative */}
+                          <p class="text-slate-300 text-xs leading-relaxed font-normal bg-[#02130d]/50 p-2 rounded-lg border border-emerald-950/40">
+                            {currentWord.story}
+                          </p>
+
+                          {/* Cognates Block */}
+                          {currentWord.related && (
+                            <div class="pt-2 border-t border-emerald-950">
+                              <span class="text-[9px] font-bold text-amber-400 uppercase tracking-wider mono block mb-1">어근 공유 동계어 묶음 (Cognates)</span>
+                              <div class="text-[11px] text-slate-400 mono leading-relaxed bg-[#032014] p-2 rounded-lg border border-emerald-950">
+                                {currentWord.related}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                    </React.Fragment>
+                  ) : (
+                    <div class="text-center p-6 bg-[#021f14] border border-emerald-900/40 rounded-xl w-full max-w-xs">
+                      <p class="text-slate-500 text-xs mb-2">선택된 단어가 없습니다.</p>
+                      <button onClick={() => { setFilterMode("all"); setSearchQuery(""); }}
+                        class="text-xs text-emerald-400 font-bold underline">필터 초기화</button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Navigation Controls */}
+                <div class="flex items-center justify-between gap-3 w-full max-w-sm mx-auto mt-4">
+                  <button onClick={handlePrev} disabled={filteredWords.length <= 1}
+                    class="flex-1 py-2.5 rounded-xl bg-[#032014] border border-emerald-950 hover:border-emerald-700 active:scale-95 text-slate-300 text-xs font-bold transition-all disabled:opacity-20">
+                    이전 단어
+                  </button>
+                  <button onClick={handleNext} disabled={filteredWords.length <= 1}
+                    class="flex-1 py-2.5 rounded-xl bg-emerald-600 active:scale-95 text-white text-xs font-bold transition-all disabled:opacity-20 shadow-lg shadow-emerald-600/10">
+                    다음 단어
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* BOTTOM GLOBAL MOBILE TAB BAR */}
+          <div class="flex-shrink-0 bg-[#021f14] border-t border-emerald-950 flex justify-around pb-safe z-50">
+            <button onClick={() => { setActiveTab("list"); setIsPlaying(false); }}
+              class={`flex-1 py-3 flex flex-col items-center justify-center gap-0.5 transition-colors ${activeTab === "list" ? "text-emerald-400 bg-emerald-950/20 font-bold" : "text-slate-500"}`}>
+              <span class="text-base">📋</span>
+              <span class="text-[10px]">단어 목록</span>
+            </button>
+            <button onClick={() => { setActiveTab("card"); setShowMeaning(true); }}
+              class={`flex-1 py-3 flex flex-col items-center justify-center gap-0.5 transition-colors ${activeTab === "card" ? "text-emerald-400 bg-emerald-950/20 font-bold" : "text-slate-500"}`}>
+              <span class="text-base">🃏</span>
+              <span class="text-[10px]">카드 학습</span>
+            </button>
+          </div>
+
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
